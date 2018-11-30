@@ -1,0 +1,121 @@
+Get /parkingBoys
+return
+[
+	{
+		employeeId: employeeId
+	}, ...
+]
+return 200
+Given 
+When Get from /parkingBoys
+Then the list of parking boys will be return
+with 200
+
+Post /parkingBoys
+{
+employeeId: employeeId
+}
+return 201
+Given a employeeId {employeeId}
+When Post to /parkingBoys {employeeId:employeeId}
+Then the parking boy record will be added to the system 
+with 201
+
+
+Post /parkingBoys/{parkingBoyId}/
+[
+	{
+		parkingLotId:parkingLotId
+	}, ...
+]
+return 201
+Given a parkingBoyId {parkingBoyId} and the list of parkingLotId [{parkingLotId:parkingLotId}, ...]
+When Post to /parkingBoys/{parkingBoyId}/
+Then the association of the parkingBoy and ParkingLots will be added to the system
+with 201
+
+
+Post /parkingBoys/{parkingBoyId}/
+[
+	{
+		parkingLotId:parkingLotId
+	}, ...
+]
+return 500 x 2 case (parkingLots managed // parkingBoy not exist)
+Given a non-existing parkingBoyId {parkingBoyId} or the list of parkingLotId [{parkingLotId:parkingLotId}, ...], which one of the parking lot is being managed by a parking boy
+When Post to /parkingBoys/{parkingBoyId}/
+Then 500 error will be return
+
+
+Get /parkingBoys/{parkingBoyId}
+return
+{
+	employeeId:employeeId,
+	parkingLots:[
+		{
+			parkingLotId:parkingLotId
+		}, ...
+	]
+}
+Given a parking boy id, {parkingBoysId}
+When Get from /parkingBoys/{parkingBoyId}
+Then the employeeId with the parking lot info will be returned
+{
+	employeeId:employeeId,
+	parkingLots:[
+		{
+			parkingLotId:parkingLotId
+		}, ...
+	]
+}
+
+
+---------------------------
+Get /parkingLots
+return
+[
+	{
+		parkingLotID: parkingLotID,
+		capacity: capacity,
+		availablePositionCount:availablePositionCount
+	}, ...
+]
+return 200
+Given 
+When Get from /parkingLots
+Then the list of parking lots with info will be returned
+[
+	{
+		parkingLotID: parkingLotID,
+		capacity: capacity,
+		availablePositionCount:availablePositionCount
+	}, ...
+]
+
+
+Post /parkingLots
+{
+	parkingLotID: parkingLotID,
+	capacity: capacity
+}
+return 201
+Given a parking lot info,
+	{
+		parkingLotID: parkingLotID,
+		capacity: capacity
+	}
+When Post to /parkingLots
+Then the parking lot will be added to the system
+with 201
+
+
+Post /parkingLots
+{
+	parkingLotID: parkingLotID,
+	capacity: capacity
+}
+return 500
+Given a parking lot with invalid capacity
+When Post to /parkingLots
+Then 500 error will be returned
+
