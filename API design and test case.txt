@@ -67,10 +67,10 @@ Post /parkingLots
 	parkingLotID: parkingLotID,
 	capacity: capacity
 }
-return 500
+return 400
 Given a parking lot with invalid capacity
 When Post to /parkingLots
-Then 500 error will be returned
+Then 400 error will be returned
 
 
 -------------------------------------
@@ -94,10 +94,10 @@ Post /parkingBoys/{parkingBoyId}/
 		parkingLotId:parkingLotId
 	}, ...
 ]
-return 500 x 2 case (parkingLots managed // parkingBoy not exist)
+return 400 x 2 case (parkingLots managed // parkingBoy not exist)
 Given a non-existing parkingBoyId {parkingBoyId} or the list of parkingLotId [{parkingLotId:parkingLotId}, ...], which one of the parking lot is being managed by a parking boy
 When Post to /parkingBoys/{parkingBoyId}/
-Then 500 error will be return
+Then 400 error will be return
 
 
 Get /parkingBoys/{parkingBoyId}
