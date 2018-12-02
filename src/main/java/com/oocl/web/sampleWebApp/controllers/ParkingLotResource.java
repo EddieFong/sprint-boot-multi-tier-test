@@ -26,6 +26,10 @@ public class ParkingLotResource {
 
     @PostMapping
     public ResponseEntity<String> add(@RequestBody ParkingLot parkingLot){
+        if (parkingLot.getCapacity() > 100) {
+            return ResponseEntity.badRequest().build();
+        }
+
         parkingLotRepository.save(parkingLot);
         return ResponseEntity.created(URI.create("/parkinglots/"+parkingLot.getParkingLotId())).build();
 
