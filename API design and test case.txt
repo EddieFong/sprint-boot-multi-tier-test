@@ -11,6 +11,7 @@ When Get from /parkingBoys
 Then the list of parking boys will be return
 with 200
 
+
 Post /parkingBoys
 {
 employeeId: employeeId
@@ -20,54 +21,6 @@ Given a employeeId {employeeId}
 When Post to /parkingBoys {employeeId:employeeId}
 Then the parking boy record will be added to the system 
 with 201
-
-
-Post /parkingBoys/{parkingBoyId}/
-[
-	{
-		parkingLotId:parkingLotId
-	}, ...
-]
-return 201
-Given a parkingBoyId {parkingBoyId} and the list of parkingLotId [{parkingLotId:parkingLotId}, ...]
-When Post to /parkingBoys/{parkingBoyId}/
-Then the association of the parkingBoy and ParkingLots will be added to the system
-with 201
-
-
-Post /parkingBoys/{parkingBoyId}/
-[
-	{
-		parkingLotId:parkingLotId
-	}, ...
-]
-return 500 x 2 case (parkingLots managed // parkingBoy not exist)
-Given a non-existing parkingBoyId {parkingBoyId} or the list of parkingLotId [{parkingLotId:parkingLotId}, ...], which one of the parking lot is being managed by a parking boy
-When Post to /parkingBoys/{parkingBoyId}/
-Then 500 error will be return
-
-
-Get /parkingBoys/{parkingBoyId}
-return
-{
-	employeeId:employeeId,
-	parkingLots:[
-		{
-			parkingLotId:parkingLotId
-		}, ...
-	]
-}
-Given a parking boy id, {parkingBoysId}
-When Get from /parkingBoys/{parkingBoyId}
-Then the employeeId with the parking lot info will be returned
-{
-	employeeId:employeeId,
-	parkingLots:[
-		{
-			parkingLotId:parkingLotId
-		}, ...
-	]
-}
 
 
 ---------------------------
@@ -119,3 +72,52 @@ Given a parking lot with invalid capacity
 When Post to /parkingLots
 Then 500 error will be returned
 
+
+-------------------------------------
+
+Post /parkingBoys/{parkingBoyId}/
+[
+	{
+		parkingLotId:parkingLotId
+	}, ...
+]
+return 201
+Given a parkingBoyId {parkingBoyId} and the list of parkingLotId [{parkingLotId:parkingLotId}, ...]
+When Post to /parkingBoys/{parkingBoyId}/
+Then the association of the parkingBoy and ParkingLots will be added to the system
+with 201
+
+
+Post /parkingBoys/{parkingBoyId}/
+[
+	{
+		parkingLotId:parkingLotId
+	}, ...
+]
+return 500 x 2 case (parkingLots managed // parkingBoy not exist)
+Given a non-existing parkingBoyId {parkingBoyId} or the list of parkingLotId [{parkingLotId:parkingLotId}, ...], which one of the parking lot is being managed by a parking boy
+When Post to /parkingBoys/{parkingBoyId}/
+Then 500 error will be return
+
+
+Get /parkingBoys/{parkingBoyId}
+return
+{
+	employeeId:employeeId,
+	parkingLots:[
+		{
+			parkingLotId:parkingLotId
+		}, ...
+	]
+}
+Given a parking boy id, {parkingBoysId}, and the parking boy exist in the system
+When Get from /parkingBoys/{parkingBoyId}
+Then the employeeId with the parking lot info will be returned
+{
+	employeeId:employeeId,
+	parkingLots:[
+		{
+			parkingLotId:parkingLotId
+		}, ...
+	]
+}
