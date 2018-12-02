@@ -136,4 +136,18 @@ public class ParkingBoyTests {
         assertEquals("parkingLot1", parkingBoyWithParkingLots.getParkingLots().get(0).getParkingLotId());
     }
 
+
+    @Test
+    public void should_not_add_parking_lot_in_parking_boy() throws Exception {
+        // Given
+        final ParkingLot parkingLot1 = new ParkingLot("parkingLot1", 2);
+        entityManager.persist(parkingLot1);
+        AssociateParkingBoyParkingLotRequest request = AssociateParkingBoyParkingLotRequest.create("parkingLot1");
+
+        // When
+        mvc.perform(post("/parkingboys/parkingBoy2/parkinglots")
+                .content(toJsonString(request)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
