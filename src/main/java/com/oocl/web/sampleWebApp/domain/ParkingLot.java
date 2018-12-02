@@ -21,6 +21,12 @@ public class ParkingLot {
     @JoinColumn(name = "parking_boy_id")
     private ParkingBoy parkingBoy;
 
+    public ParkingLot(String parkingLotId, int capacity) {
+        this.parkingLotId = parkingLotId;
+        this.capacity = capacity;
+
+    }
+
     public Long getId() {
         return id;
     }

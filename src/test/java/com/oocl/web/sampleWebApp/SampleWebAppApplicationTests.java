@@ -4,9 +4,12 @@ import com.oocl.web.sampleWebApp.domain.ParkingBoy;
 import com.oocl.web.sampleWebApp.domain.ParkingBoyRepository;
 import com.oocl.web.sampleWebApp.domain.ParkingLot;
 import com.oocl.web.sampleWebApp.domain.ParkingLotRepository;
+import com.oocl.web.sampleWebApp.models.AssociateParkingBoyParkingLotRequest;
 import com.oocl.web.sampleWebApp.models.ParkingBoyResponse;
 import com.oocl.web.sampleWebApp.models.ParkingBoyWithParkingLotResponse;
 import com.oocl.web.sampleWebApp.models.ParkingLotResponse;
+import static com.oocl.web.sampleWebApp.WebTestUtil.toJsonString;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
@@ -149,4 +152,26 @@ public class SampleWebAppApplicationTests {
         assertTrue(parkingLots.stream().anyMatch(pl -> pl.getParkingLotId().equals("parkingLot1")));
         assertTrue(parkingLots.stream().anyMatch(pl -> pl.getParkingLotId().equals("parkingLot2")));
     }
+
+    @Test
+    public void should_associate_parking_boy_with_parking_lot() throws Exception {
+        // Given
+        final ParkingBoy employee = new ParkingBoy("parkingBoy1");
+        final ParkingLot parkingLot1 = new ParkingLot("parkingLot1", 2);
+        entityManager.persist(employee);
+        entityManager.persist(parkingLot1);
+
+        AssociateParkingBoyParkingLotRequest request = AssociateParkingBoyParkingLotRequest.create("parkingLot1");
+
+        // When
+        mvc.perform(post("/parkingboys/parkingBoy1/parkinglots")
+                .content(toJsonString(request)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        // Then
+        final ParkingBoyWithParkingLotResponse parkingBoyWithParkingLots = getContentAsObject(
+                mvc.perform(get("/parkingboys/parkingBoy1")).andReturn(), ParkingBoyWithParkingLotResponse.class);
+        assertEquals("parkingLot1", parkingBoyWithParkingLots.getParkingLots().get(0).getParkingLotId());
+    }
+
 }
