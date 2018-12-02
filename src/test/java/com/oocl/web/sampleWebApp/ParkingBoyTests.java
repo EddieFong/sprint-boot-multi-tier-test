@@ -8,8 +8,6 @@ import com.oocl.web.sampleWebApp.models.AssociateParkingBoyParkingLotRequest;
 import com.oocl.web.sampleWebApp.models.ParkingBoyResponse;
 import com.oocl.web.sampleWebApp.models.ParkingBoyWithParkingLotResponse;
 import com.oocl.web.sampleWebApp.models.ParkingLotResponse;
-import static com.oocl.web.sampleWebApp.WebTestUtil.toJsonString;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +20,10 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-
 import java.util.List;
 
 import static com.oocl.web.sampleWebApp.WebTestUtil.getContentAsObject;
+import static com.oocl.web.sampleWebApp.WebTestUtil.toJsonString;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -38,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class SampleWebAppApplicationTests {
+public class ParkingBoyTests {
     @Autowired
     private ParkingBoyRepository parkingBoyRepository;
 
@@ -84,42 +82,6 @@ public class SampleWebAppApplicationTests {
 
     }
 
-
-    @Test
-    public void should_get_parking_lots() throws Exception {
-        // Given
-        ParkingLot parkingLot1 = new ParkingLot();
-        parkingLot1.setParkingLotId("parkingLot1");
-        parkingLot1.setCapacity(10);
-        final ParkingLot parkingLot = parkingLotRepository.save(parkingLot1);
-
-        // When
-        final MvcResult result = mvc.perform(get("/parkinglots"))
-                .andReturn();
-
-        // Then
-        assertEquals(200, result.getResponse().getStatus());
-
-        final ParkingLotResponse[] parkingLots = getContentAsObject(result, ParkingLotResponse[].class);
-
-        assertEquals(1, parkingLots.length);
-        assertEquals("parkingLot1", parkingLots[0].getParkingLotId());
-        assertEquals(10, parkingLots[0].getCapacity());
-    }
-
-
-    @Test
-    public void should_add_new_parking_lot() throws Exception {
-        //given
-        String newParkingLotInJson = "{\"parkingLotId\":\"parkingLot1\", \"capacity\":10}";
-        //when
-        mvc.perform(post("/parkinglots")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(newParkingLotInJson)
-        )//then
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString("/parkinglots/parkingLot1")));
-    }
 
     @Test
     public void should_get_parking_boy_with_parking_lots() throws Exception {
