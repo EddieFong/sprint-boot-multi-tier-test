@@ -98,4 +98,17 @@ public class SampleWebAppApplicationTests {
         assertEquals(10, parkingLots[0].getCapacity());
     }
 
+
+    @Test
+    public void should_add_new_parking_lot() throws Exception {
+        //given
+        String newParkingLotInJson = "{\"parkingLotId\":\"parkingLot1\", \"capacity\":10}";
+        //when
+        mvc.perform(post("/parkinglots")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(newParkingLotInJson)
+        )//then
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString("/parkinglots/parkingLot1")));
+    }
 }
