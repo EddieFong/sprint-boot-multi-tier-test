@@ -5,24 +5,28 @@ import com.oocl.web.sampleWebApp.domain.ParkingBoyRepository;
 import com.oocl.web.sampleWebApp.domain.ParkingLot;
 import com.oocl.web.sampleWebApp.domain.ParkingLotRepository;
 import com.oocl.web.sampleWebApp.models.ParkingBoyResponse;
+import com.oocl.web.sampleWebApp.models.ParkingBoyWithParkingLotResponse;
 import com.oocl.web.sampleWebApp.models.ParkingLotResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
+import java.util.List;
 
 import static com.oocl.web.sampleWebApp.WebTestUtil.getContentAsObject;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class SampleWebAppApplicationTests {
     @Autowired
     private ParkingBoyRepository parkingBoyRepository;
@@ -40,14 +45,16 @@ public class SampleWebAppApplicationTests {
     @Autowired
     private MockMvc mvc;
 
+    @Autowired
+    private EntityManager entityManager;
+
 	@Test
 	public void should_get_parking_boys() throws Exception {
 	    // Given
         final ParkingBoy boy = parkingBoyRepository.save(new ParkingBoy("boy"));
 
         // When
-        final MvcResult result = mvc.perform(MockMvcRequestBuilders
-            .get("/parkingboys"))
+        final MvcResult result = mvc.perform(get("/parkingboys"))
             .andReturn();
 
         // Then
@@ -84,8 +91,7 @@ public class SampleWebAppApplicationTests {
         final ParkingLot parkingLot = parkingLotRepository.save(parkingLot1);
 
         // When
-        final MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get("/parkinglots"))
+        final MvcResult result = mvc.perform(get("/parkinglots"))
                 .andReturn();
 
         // Then
@@ -110,5 +116,37 @@ public class SampleWebAppApplicationTests {
         )//then
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", containsString("/parkinglots/parkingLot1")));
+    }
+
+    @Test
+    public void should_get_parking_boy_with_parking_lots() throws Exception {
+        // Given
+        final ParkingBoy parkingBoy1 = new ParkingBoy("parkingBoy1");
+        final ParkingLot parkingLot1 = new ParkingLot();
+        parkingLot1.setParkingLotId("parkingLot1");
+        parkingLot1.setCapacity(2);
+        parkingLot1.setParkingBoy(parkingBoy1);
+
+        final ParkingLot parkingLot2 = new ParkingLot();
+        parkingLot2.setParkingLotId("parkingLot2");
+        parkingLot2.setCapacity(3);
+        parkingLot2.setParkingBoy(parkingBoy1);
+
+        entityManager.persist(parkingLot1);
+        entityManager.persist(parkingLot2);
+
+
+        // When
+        final MvcResult result = mvc.perform(get("/parkingboys/parkingBoy1"))
+                .andExpect(status().isOk())
+                .andReturn();
+        final ParkingBoyWithParkingLotResponse response = getContentAsObject(
+                result, ParkingBoyWithParkingLotResponse.class);
+
+        assertEquals("parkingBoy1", response.getEmployeeId());
+        List<ParkingLotResponse> parkingLots = response.getParkingLots();
+        assertEquals(2, parkingLots.size());
+        assertTrue(parkingLots.stream().anyMatch(pl -> pl.getParkingLotId().equals("parkingLot1")));
+        assertTrue(parkingLots.stream().anyMatch(pl -> pl.getParkingLotId().equals("parkingLot2")));
     }
 }

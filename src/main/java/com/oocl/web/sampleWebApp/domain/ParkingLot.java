@@ -17,6 +17,10 @@ public class ParkingLot {
     @Column(name = "capacity", unique = false, nullable = false)
     private int capacity;
 
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "parking_boy_id")
+    private ParkingBoy parkingBoy;
+
     public Long getId() {
         return id;
     }
@@ -37,6 +41,14 @@ public class ParkingLot {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public ParkingBoy getParkingBoy() {
+        return parkingBoy;
+    }
+
+    public void setParkingBoy(ParkingBoy parkingBoy) {
+        this.parkingBoy = parkingBoy;
     }
 }
 
